@@ -59,3 +59,111 @@ function deleteCard(cardElement) {
 initialCards.forEach((cardData) => {
   placeList.append(createCard(cardData, deleteCard));
 })
+
+
+
+// POPUPS
+
+const popupTypeNewCard = document.querySelector('.popup_type_new-card');
+
+const popupTypeEdit = document.querySelector('.popup_type_edit')
+
+const profileAddButton = document.querySelector('.profile__add-button');
+
+const profileEditButton = document.querySelector('.profile__edit-button')
+
+const popupsClose = document.querySelectorAll('.popup__close');
+
+function openPopup(evt) {
+  evt.style.display = "flex";
+  document.addEventListener('keydown', keyHandler);
+  evt.classList.add('popup_is-opened');
+}
+
+function closePopup(evt) {
+  evt.style.display = "none";
+  document.addEventListener('keydown', keyHandler);
+  evt.classList.remove('popup_is-opened');
+  const forms = document.querySelectorAll('form');
+  forms.forEach(form => form.reset());
+  // document.querySelector('.popup__form').reset();
+}
+
+function keyHandler(event) {
+  if (event.key === 'Escape') {
+    const openPopup = document.querySelector('.popup[style*="flex"]');
+    if (openPopup) {
+      closePopup(openPopup);
+    }
+  }
+}
+
+profileAddButton.addEventListener('click', () => {
+  openPopup(popupTypeNewCard);
+})
+
+profileEditButton.addEventListener('click', () => {
+  openPopup(popupTypeEdit);
+})
+
+popupsClose.forEach((element => {
+  element.addEventListener('click', () => {
+    const popup = element.closest('.popup');
+    closePopup(popup);
+  })
+}))
+
+document.addEventListener('click', (event) => {
+  const popup = event.target.closest('.popup');
+  if (popup) {
+    const popupContent = event.target.closest('.popup__content');
+    if (!popupContent) {
+      closePopup(popup);
+    }
+  }
+})
+
+// Title and form
+const profileTitle = document.querySelector('.profile__title');
+const popupInputTypeName = document.querySelector('.popup__input_type_name');
+const popupInputTypeDescription = document.querySelector('.popup__input_type_description');
+const profileDescription = document.querySelector('.profile__description')
+
+popupInputTypeName.placeholder = profileTitle.textContent;
+popupInputTypeDescription.placeholder = profileDescription.textContent; 
+
+
+
+// Submit form
+// Находим форму в DOM
+const formElement = document.querySelector('.popup__form');
+// Находим поля формы в DOM
+const nameInput = document.querySelector('.popup__input_type_name')
+const jobInput = document.querySelector('.popup__input_type_description')
+
+// Обработчик «отправки» формы, хотя пока
+// она никуда отправляться не будет
+function handleFormSubmit(evt) {
+    evt.preventDefault(); // Эта строчка отменяет стандартную отправку формы.
+                                                // Так мы можем определить свою логику отправки.
+                                                // О том, как это делать, расскажем позже.
+
+    // Получите значение полей jobInput и nameInput из свойства value
+
+    const nameValue = nameInput.value;
+    const jobValue = jobInput.value;
+
+    // Выберите элементы, куда должны быть вставлены значения полей
+
+    const profileName = document.querySelector('.profile__title')
+    const profileDescription = document.querySelector('.profile__description')
+
+    // Вставьте новые значения с помощью textContent
+
+    profileName.textContent = nameValue;
+    profileDescription.textContent = jobValue;
+}
+
+// Прикрепляем обработчик к форме:
+// он будет следить за событием “submit” - «отправка»
+formElement.addEventListener('submit', handleFormSubmit);
