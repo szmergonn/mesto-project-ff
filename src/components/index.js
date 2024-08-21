@@ -29,7 +29,12 @@ import {
   imagePopup,
   formNewCard,
   placeNameInput,
-  placeLinkInput
+  placeLinkInput,
+  profileTitle,
+  formElement,
+  nameInput,
+  jobInput,
+  profileDescription
 } from "./constants.js"
 import "../pages/index.css";
 import { openModal, closeModal } from "./modal.js";
@@ -69,14 +74,7 @@ popups.forEach((popup) => {
       closeModal(popup);
     }
   })
-})
-
-// Title and form
-const profileTitle = document.querySelector('.profile__title');
-const formElement = document.querySelector('.popup__form[name="edit-profile"]');
-const nameInput = document.querySelector('.popup__input_type_name');
-const jobInput = document.querySelector('.popup__input_type_description');
-const profileDescription = document.querySelector('.profile__description'); 
+}) 
 
 function handleProfileFormSubmit(evt) {
   evt.preventDefault();
@@ -102,7 +100,8 @@ function handleNewCardSubmit(evt) {
   placeList.prepend(createCard(newCard, deleteCard, toggleLike, openImagePopup));
 
   formNewCard.reset();
-  closeModal(popupTypeNewCard);
+
+  closeModal(popupTypeNewCard); 
 }
 
 formNewCard.addEventListener('submit', handleNewCardSubmit);

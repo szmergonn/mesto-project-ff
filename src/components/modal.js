@@ -1,3 +1,8 @@
+import {
+  popupTypeNewCard,
+  formNewCard
+} from "./constants";
+
 export function openModal(modal) {
   document.addEventListener('keydown', closeModalByEscape);
   modal.classList.add('popup_is-animated');
@@ -9,6 +14,9 @@ export function openModal(modal) {
 export function closeModal(modal) {
   document.removeEventListener('keydown', closeModalByEscape);
   modal.classList.remove('popup_is-opened');
+  if(modal === popupTypeNewCard) {
+    formNewCard.reset();
+  }
   setTimeout(() => {
     modal.classList.remove('popup_is-animated');
   }, 600);

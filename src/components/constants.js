@@ -10,6 +10,12 @@ export const imagePopup = document.querySelector('.popup_type_image');
 export const formNewCard = document.querySelector('.popup__form[name="new-place"]');
 export const placeNameInput = formNewCard.querySelector('.popup__input_type_card-name');
 export const placeLinkInput = formNewCard.querySelector('.popup__input_type_url');
+// Title and form
+export const profileTitle = document.querySelector('.profile__title');
+export const formElement = document.querySelector('.popup__form[name="edit-profile"]');
+export const nameInput = document.querySelector('.popup__input_type_name');
+export const jobInput = document.querySelector('.popup__input_type_description');
+export const profileDescription = document.querySelector('.profile__description');
 
 export const addIcon = new URL("../images/add-icon.svg", import.meta.url);
 export const avatar = new URL("../images/avatar.jpg", import.meta.url);
