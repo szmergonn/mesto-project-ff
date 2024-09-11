@@ -38,6 +38,7 @@ import {
 } from "./constants.js"
 import "../pages/index.css";
 import { openModal, closeModal } from "./modal.js";
+import { clearValidation, enableValidation, validationConfig } from "./validation.js"
 
 export const images = [
   { name: "addIcon", link: addIcon },
@@ -59,10 +60,14 @@ initialCards.forEach((cardData) => {
 })
 
 profileAddButton.addEventListener('click', () => {
+  clearValidation(formNewCard, validationConfig);
+
   openModal(popupTypeNewCard);
 })
 
 profileEditButton.addEventListener('click', () => {
+  clearValidation(formElement, validationConfig);
+
   openModal(popupTypeEdit);
   nameInput.value = profileTitle.textContent;
   jobInput.value = profileDescription.textContent;
@@ -113,3 +118,5 @@ export function openImagePopup(imageLink, imageCaption) {
 
   openModal(imagePopup);
 }
+
+enableValidation(validationConfig);

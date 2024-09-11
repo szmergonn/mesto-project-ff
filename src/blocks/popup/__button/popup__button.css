@@ -25,6 +25,12 @@
   background-color: #fff;
 }
 
+.popup__button_disabled:hover {
+  color: #c4c4c4;
+  border: 1px solid #c4c4c4;
+  background-color: #fff;
+}
+
 @media screen and (max-width: 568px) {
   .popup__button {
     font-size: 14px;

@@ -11,6 +11,7 @@ export const formNewCard = document.querySelector('.popup__form[name="new-place"
 export const placeNameInput = formNewCard.querySelector('.popup__input_type_card-name');
 export const placeLinkInput = formNewCard.querySelector('.popup__input_type_url');
 // Title and form
+export const formSelector = document.querySelector('.popup__form');
 export const profileTitle = document.querySelector('.profile__title');
 export const formElement = document.querySelector('.popup__form[name="edit-profile"]');
 export const nameInput = document.querySelector('.popup__input_type_name');
