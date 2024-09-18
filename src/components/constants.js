@@ -17,6 +17,7 @@ export const formElement = document.querySelector('.popup__form[name="edit-profi
 export const nameInput = document.querySelector('.popup__input_type_name');
 export const jobInput = document.querySelector('.popup__input_type_description');
 export const profileDescription = document.querySelector('.profile__description');
+export const profileImage = document.querySelector('.profile__image');
 
 export const addIcon = new URL("../images/add-icon.svg", import.meta.url);
 export const avatar = new URL("../images/avatar.jpg", import.meta.url);

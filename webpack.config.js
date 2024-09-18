@@ -10,7 +10,8 @@ module.exports = {
     './src/components/modal.js', 
     './src/components/card.js',
     './src/components/constants.js',
-    './src/components/validation.js'],
+    './src/components/validation.js',
+    './src/components/api.js'],
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: 'main.js',
