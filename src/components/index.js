@@ -1,6 +1,10 @@
 import {
-  initialCards
-} from "./cards.js"
+  getInitialCards,
+  addNewCard,
+  getUserData,
+  editUserData,
+  updateAvatar
+} from "./api.js"
 import { 
   createCard,
   deleteCard,
@@ -28,13 +32,17 @@ import {
   popupCaption,
   imagePopup,
   formNewCard,
+  formNewAvatar,
   placeNameInput,
   placeLinkInput,
   profileTitle,
   formElement,
   nameInput,
   jobInput,
-  profileDescription
+  profileDescription,
+  profileImage,
+  profileImageOverlay,
+  popupTypeNewAvatar
 } from "./constants.js"
 import "../pages/index.css";
 import { openModal, closeModal } from "./modal.js";
@@ -54,20 +62,35 @@ export const images = [
   { name: "logoIcon", link: logoIcon }
 ]
 
-// Вывести карточки на страницу
-initialCards.forEach((cardData) => {
-  placeList.append(createCard(cardData, deleteCard, toggleLike, openImagePopup));
+Promise.all([getUserData(), getInitialCards()])
+  .then(([userData, cards]) => {
+    profileTitle.textContent = userData.name;
+    profileDescription.textContent = userData.about;
+    profileImage.style.backgroundImage = `url(${userData.avatar})`
+
+    const userId = userData._id
+
+    cards.forEach((cardData) => {
+      placeList.append(createCard(cardData, deleteCard, toggleLike, openImagePopup, userId));
+    })
+  })
+  .catch((err) => {
+    console.log(`Error in userData or cardsData: ${err}`)
+  })
+  
+profileImageOverlay.addEventListener('click', () => {
+  clearValidation(formNewAvatar, validationConfig);
+  formNewAvatar.reset();
+  openModal(popupTypeNewAvatar)
 })
 
 profileAddButton.addEventListener('click', () => {
   clearValidation(formNewCard, validationConfig);
-
   openModal(popupTypeNewCard);
 })
 
 profileEditButton.addEventListener('click', () => {
   clearValidation(formElement, validationConfig);
-
   openModal(popupTypeEdit);
   nameInput.value = profileTitle.textContent;
   jobInput.value = profileDescription.textContent;
@@ -86,11 +109,22 @@ function handleProfileFormSubmit(evt) {
 
   const nameValue = nameInput.value;
   const jobValue = jobInput.value;
+  const saveButton = formElement.querySelector(validationConfig.submitButtonSelector);
+  saveButton.textContent = 'Сохранение...';
 
-  profileTitle.textContent = nameValue;
-  profileDescription.textContent = jobValue;
+  editUserData(nameValue, jobValue)
+    .then((newData) => {
+      profileTitle.textContent = newData.name;
+      profileDescription.textContent = newData.about;
 
-  closeModal(popupTypeEdit);
+      closeModal(popupTypeEdit);
+    })
+    .catch((err) => {
+      console.log(`Error in updating profile ${err}`)
+    })
+    .finally(() => {
+      saveButton.textContent = 'Сохранить'
+    })
 }
 
 formElement.addEventListener('submit', handleProfileFormSubmit);
@@ -102,14 +136,49 @@ function handleNewCardSubmit(evt) {
     link: placeLinkInput.value
   };
 
-  placeList.prepend(createCard(newCard, deleteCard, toggleLike, openImagePopup));
+  const saveButton = formNewCard.querySelector(validationConfig.submitButtonSelector);
+  saveButton.textContent = 'Создание...';
 
-  formNewCard.reset();
+  addNewCard(newCard.name, newCard.link)
+    .then((cardData) => {
+      const userId = cardData.owner._id;
+      placeList.prepend(createCard(cardData, deleteCard, toggleLike, openImagePopup, userId));
 
-  closeModal(popupTypeNewCard); 
+      formNewCard.reset();
+      closeModal(popupTypeNewCard); 
+    })
+    .catch((err) => {
+      console.log(`Error in adding a new card: ${err}`)
+    })
+    .finally(() => {
+      saveButton.textContent = 'Создать'
+    })
 }
 
 formNewCard.addEventListener('submit', handleNewCardSubmit);
+
+function handleNewAvatarSubmit(evt) {
+  evt.preventDefault();
+
+  const avatarLink = formNewAvatar.querySelector('.popup__input_type_url').value;
+  const saveButton = formNewAvatar.querySelector(validationConfig.submitButtonSelector);
+  saveButton.textContent = 'Сохранение...';
+  updateAvatar(avatarLink) 
+    .then((updatedUserData) => {
+      profileImage.style.backgroundImage = `url(${updatedUserData.avatar})`;
+
+      formNewAvatar.reset();
+      closeModal(popupTypeNewAvatar);
+    })
+    .catch((err) => {
+      console.log(`Error in updating avatar: ${err}`)
+    })
+    .finally(() => {
+      saveButton.textContent = 'Сохранить'
+    })
+}
+
+formNewAvatar.addEventListener('submit', handleNewAvatarSubmit)
 
 export function openImagePopup(imageLink, imageCaption) {
   popupImage.src = imageLink;
