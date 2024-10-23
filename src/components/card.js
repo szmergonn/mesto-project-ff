@@ -1,4 +1,4 @@
-import { removeOldCard, config, handleResponse } from "./api";
+import { removeCard, deleteLikeCard, addLikeCard } from "./api";
 
  // Темплейт карточки
  const cardTemplate = document.querySelector('#card-template').content;
@@ -30,9 +30,12 @@ export function createCard(cardData, deleteCardCallback, likeCardCallback, image
 
    // добавить обработчик клика на лайк
    const likeButton = cardElement.querySelector('.card__like-button');
-   if (cardData.likes.some((like) => like._id === userId)) {
+   const isLiked = cardData.likes.some((like) => like._id === userId);
+
+   if(isLiked) {
     likeButton.classList.add('card__like-button_is-active')
    }
+  
    likeButton.addEventListener('click', function() {
      likeCardCallback(likeButton, cardLikecounter, cardData);
    });
@@ -47,7 +50,7 @@ export function createCard(cardData, deleteCardCallback, likeCardCallback, image
 
 // Функция удаления карточки
 export function deleteCard(cardElement, cardId) {
-  removeOldCard(cardId)
+  removeCard(cardId)
     .then(() => {
       cardElement.remove();
     })
@@ -61,30 +64,22 @@ export function toggleLike(likeButton, cardLikeCounter, cardData) {
   const isLiked = likeButton.classList.contains('card__like-button_is-active');
 
   if (isLiked) {
-    fetch(`${config.baseUrl}/cards/likes/${cardData._id}`, { 
-      method: 'DELETE',
-      headers: config.headers
-    })
-    .then((res) => handleResponse(res))
-    .then((updateCardData) => {
-      cardLikeCounter.textContent = updateCardData.likes.length;
-      likeButton.classList.remove('card__like-button_is-active');
-    })
-    .catch((err) => {
-      console.error(`Error in deleting like from card: ${err}`);
-    });
+    deleteLikeCard(cardData._id)
+      .then((updateCardData) => {
+        cardLikeCounter.textContent = updateCardData.likes.length;
+        likeButton.classList.remove('card__like-button_is-active');
+      })
+      .catch((err) => {
+        console.error(`Error in deleting like from card: ${err}`);
+      });
   } else {
-    fetch(`${config.baseUrl}/cards/likes/${cardData._id}`, {
-      method: 'PUT',
-      headers: config.headers
-    })
-    .then((res) => handleResponse(res))
-    .then((updateCardData) => {
-      cardLikeCounter.textContent = updateCardData.likes.length;
-      likeButton.classList.add('card__like-button_is-active');
-    })
-    .catch((err) => {
-      console.error(`Error adding like on card: ${err}`);
-    });
-  }
+    addLikeCard(cardData._id)
+      .then((updateCardData) => {
+        cardLikeCounter.textContent = updateCardData.likes.length;
+        likeButton.classList.add('card__like-button_is-active');
+      })
+      .catch((err) => {
+        console.error(`Error adding like on card: ${err}`);
+      });
+    }
 }

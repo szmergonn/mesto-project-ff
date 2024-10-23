@@ -80,7 +80,7 @@ export const clearValidation = (profileForm, validationConfig) => {
 }
 
 // Функция включения и отключения кнопки
-const toggleButton = (formSelector, buttonElement, config) => {
+export const toggleButton = (formSelector, buttonElement, config) => {
   const inputList = Array.from(formSelector.querySelectorAll(config.inputSelector));
   const hasInvalidInput = inputList.some(inputElement => !inputElement.validity.valid);
 

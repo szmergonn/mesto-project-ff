@@ -48,14 +48,15 @@ export const addNewCard = (name, link) => {
         headers: config.headers,
         method: 'POST',
         body: JSON.stringify({
-            name: name,
-            link: link
+            name,
+            link
         })
     })
         .then((res) => handleResponse(res))
 }
 
-export const removeOldCard = (cardId) => {
+// Функия удаления карточки
+export const removeCard = (cardId) => {
     return fetch(`${config.baseUrl}/cards/${cardId}`, {
         headers: config.headers,
         method: 'DELETE'
@@ -63,6 +64,7 @@ export const removeOldCard = (cardId) => {
     .then((res) => handleResponse(res))
 }
 
+// Функция обновляющая аватар
 export const updateAvatar = (link) => {
     return fetch(`${config.baseUrl}/users/me/avatar`, {
         headers: config.headers,
@@ -72,4 +74,22 @@ export const updateAvatar = (link) => {
         })
     })
     .then((res) => handleResponse(res))
+}
+
+// Функция для удаления лайка с карточки
+export const deleteLikeCard = (cardId) => {
+    return fetch(`${config.baseUrl}/cards/likes/${cardId}`, {
+        method: 'DELETE',
+        headers: config.headers
+    })
+    .then((res) => handleResponse(res));
+}
+
+// Функция для добавления лайка к карточке
+export const addLikeCard = (cardId) => {
+    return fetch(`${config.baseUrl}/cards/likes/${cardId}`, {
+        method: 'PUT',
+        headers: config.headers
+    })
+    .then((res) => handleResponse(res));
 }

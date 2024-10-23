@@ -11,23 +11,12 @@ import {
   toggleLike
  } from "./card.js";
 import {
-  placeList,
+  cardsContainer,
   popupTypeNewCard,
   popupTypeEdit,
   profileAddButton,
   profileEditButton,
   popups,
-  addIcon,
-  avatar,
-  cardOne,
-  cardTwo,
-  cardThree,
-  closeIcon,
-  deleteIcon,
-  editIcon,
-  likeActiveIcon,
-  likeInactiveIcon,
-  logoIcon,
   popupImage,
   popupCaption,
   imagePopup,
@@ -36,7 +25,7 @@ import {
   placeNameInput,
   placeLinkInput,
   profileTitle,
-  formElement,
+  profileForm,
   nameInput,
   jobInput,
   profileDescription,
@@ -45,72 +34,21 @@ import {
   popupTypeNewAvatar
 } from "./constants.js"
 import "../pages/index.css";
-import { openModal, closeModal } from "./modal.js";
-import { clearValidation, enableValidation, validationConfig } from "./validation.js"
+import { openModal, closeModal, handleCloseModalByClick } from "./modal.js";
+import { clearValidation, enableValidation, validationConfig, toggleButton } from "./validation.js"
 
-export const images = [
-  { name: "addIcon", link: addIcon },
-  { name: "avatar", link: avatar },
-  { name: "cardOne", link: cardOne },
-  { name: "cardTwo", link: cardTwo },
-  { name: "cardThree", link: cardThree },
-  { name: "closeIcon", link: closeIcon },
-  { name: "deleteIcon", link: deleteIcon },
-  { name: "editIcon", link: editIcon },
-  { name: "likeActiveIcon", link: likeActiveIcon },
-  { name: "likeInactiveIcon", link: likeInactiveIcon },
-  { name: "logoIcon", link: logoIcon }
-]
 
-Promise.all([getUserData(), getInitialCards()])
-  .then(([userData, cards]) => {
-    profileTitle.textContent = userData.name;
-    profileDescription.textContent = userData.about;
-    profileImage.style.backgroundImage = `url(${userData.avatar})`
-
-    const userId = userData._id
-
-    cards.forEach((cardData) => {
-      placeList.append(createCard(cardData, deleteCard, toggleLike, openImagePopup, userId));
-    })
-  })
-  .catch((err) => {
-    console.log(`Error in userData or cardsData: ${err}`)
-  })
-  
-profileImageOverlay.addEventListener('click', () => {
-  clearValidation(formNewAvatar, validationConfig);
-  formNewAvatar.reset();
-  openModal(popupTypeNewAvatar)
-})
-
-profileAddButton.addEventListener('click', () => {
-  clearValidation(formNewCard, validationConfig);
-  openModal(popupTypeNewCard);
-})
-
-profileEditButton.addEventListener('click', () => {
-  clearValidation(formElement, validationConfig);
-  openModal(popupTypeEdit);
-  nameInput.value = profileTitle.textContent;
-  jobInput.value = profileDescription.textContent;
-})
-
-popups.forEach((popup) => {
-  popup.addEventListener(('click'), (evt) => {
-    if (evt.target === evt.currentTarget || evt.target.classList.contains('popup__close')) {
-      closeModal(popup);
-    }
-  })
-}) 
+const profileSaveButton = profileForm.querySelector(validationConfig.submitButtonSelector);
+const cardSaveButton = formNewCard.querySelector(validationConfig.submitButtonSelector);
+const avatarSaveButton = formNewAvatar.querySelector(validationConfig.submitButtonSelector);
+const avatarLink = formNewAvatar.querySelector('.popup__input_type_url').value;
 
 function handleProfileFormSubmit(evt) {
   evt.preventDefault();
 
   const nameValue = nameInput.value;
   const jobValue = jobInput.value;
-  const saveButton = formElement.querySelector(validationConfig.submitButtonSelector);
-  saveButton.textContent = 'Сохранение...';
+  profileSaveButton.textContent = 'Сохранение...';
 
   editUserData(nameValue, jobValue)
     .then((newData) => {
@@ -123,11 +61,15 @@ function handleProfileFormSubmit(evt) {
       console.log(`Error in updating profile ${err}`)
     })
     .finally(() => {
-      saveButton.textContent = 'Сохранить'
+      profileSaveButton.textContent = 'Сохранить'
     })
 }
 
-formElement.addEventListener('submit', handleProfileFormSubmit);
+function handleProfileImageClick() {
+  clearValidation(formNewAvatar, validationConfig);
+  formNewAvatar.reset();
+  openModal(popupTypeNewAvatar)
+}
 
 function handleNewCardSubmit(evt) {
   evt.preventDefault();
@@ -136,14 +78,14 @@ function handleNewCardSubmit(evt) {
     link: placeLinkInput.value
   };
 
-  const saveButton = formNewCard.querySelector(validationConfig.submitButtonSelector);
-  saveButton.textContent = 'Создание...';
+  cardSaveButton.textContent = 'Создание...';
 
   addNewCard(newCard.name, newCard.link)
     .then((cardData) => {
       const userId = cardData.owner._id;
-      placeList.prepend(createCard(cardData, deleteCard, toggleLike, openImagePopup, userId));
+      cardsContainer.prepend(createCard(cardData, deleteCard, toggleLike, openImagePopup, userId));
 
+      clearValidation(formNewCard, validationConfig);
       formNewCard.reset();
       closeModal(popupTypeNewCard); 
     })
@@ -151,34 +93,27 @@ function handleNewCardSubmit(evt) {
       console.log(`Error in adding a new card: ${err}`)
     })
     .finally(() => {
-      saveButton.textContent = 'Создать'
+      cardSaveButton.textContent = 'Создать'
     })
 }
-
-formNewCard.addEventListener('submit', handleNewCardSubmit);
 
 function handleNewAvatarSubmit(evt) {
   evt.preventDefault();
 
-  const avatarLink = formNewAvatar.querySelector('.popup__input_type_url').value;
-  const saveButton = formNewAvatar.querySelector(validationConfig.submitButtonSelector);
-  saveButton.textContent = 'Сохранение...';
+  avatarSaveButton.textContent = 'Сохранение...';
   updateAvatar(avatarLink) 
     .then((updatedUserData) => {
       profileImage.style.backgroundImage = `url(${updatedUserData.avatar})`;
 
-      formNewAvatar.reset();
       closeModal(popupTypeNewAvatar);
     })
     .catch((err) => {
       console.log(`Error in updating avatar: ${err}`)
     })
     .finally(() => {
-      saveButton.textContent = 'Сохранить'
+      avatarSaveButton.textContent = 'Сохранить'
     })
 }
-
-formNewAvatar.addEventListener('submit', handleNewAvatarSubmit)
 
 export function openImagePopup(imageLink, imageCaption) {
   popupImage.src = imageLink;
@@ -187,5 +122,46 @@ export function openImagePopup(imageLink, imageCaption) {
 
   openModal(imagePopup);
 }
+
+
+Promise.all([getUserData(), getInitialCards()])
+  .then(([userData, cards]) => {
+    profileTitle.textContent = userData.name;
+    profileDescription.textContent = userData.about;
+    profileImage.style.backgroundImage = `url(${userData.avatar})`
+
+    const userId = userData._id
+
+    cards.forEach((cardData) => {
+      cardsContainer.append(createCard(cardData, deleteCard, toggleLike, openImagePopup, userId));
+    })
+  })
+  .catch((err) => {
+    console.log(`Error in userData or cardsData: ${err}`)
+  })
+  
+popups.forEach((popup) => {
+  popup.addEventListener('click', handleCloseModalByClick);
+});
+
+profileImageOverlay.addEventListener('click', handleProfileImageClick)
+
+profileForm.addEventListener('submit', handleProfileFormSubmit);
+
+formNewCard.addEventListener('submit', handleNewCardSubmit);
+
+formNewAvatar.addEventListener('submit', handleNewAvatarSubmit)
+
+profileAddButton.addEventListener('click', () => {
+  toggleButton(formNewCard, cardSaveButton, validationConfig)
+  openModal(popupTypeNewCard);
+})
+
+profileEditButton.addEventListener('click', () => {
+  clearValidation(profileForm, validationConfig);
+  openModal(popupTypeEdit);
+  nameInput.value = profileTitle.textContent;
+  jobInput.value = profileDescription.textContent;
+})
 
 enableValidation(validationConfig);
