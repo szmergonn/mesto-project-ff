@@ -21,8 +21,8 @@ const hideInputError = (formSelector, inputSelector) => {
   const errorElement = formSelector.querySelector(`.${inputSelector.id}-error`);
 
   errorElement.textContent = '';
-  inputSelector.classList.remove('popup__input_type_error');
-  errorElement.classList.remove('popup__input-error_visible');
+  inputSelector.classList.remove(validationConfig.inputErrorClass);
+  errorElement.classList.remove(validationConfig.errorClass);
 }
 
 // Функция проверяющая валидность
@@ -48,7 +48,7 @@ const setEventListeners = (formSelector, config) => {
   inputList.forEach((inputSelector) => {
     inputSelector.addEventListener('input', () => {
       isValid(formSelector, inputSelector, config)
-      toggleButton(formSelector, buttonElement, config);
+      toggleButton(inputList, buttonElement, config);
     });
   })
 }
@@ -62,31 +62,29 @@ export const enableValidation = (config) => {
   })
 }
 
+// Функция для неактивной кнопки
+const disableButton = (buttonElement, config) => {
+  buttonElement.classList.add(config.inactiveButtonClass);
+  buttonElement.disabled = true;
+}
+
 // Функция очищающая валидацию
-export const clearValidation = (profileForm, validationConfig) => {
-  const inputList = Array.from(profileForm.querySelectorAll(`${validationConfig.inputSelector}`));
+export const clearValidation = (profileForm, config) => {
+  const inputList = Array.from(profileForm.querySelectorAll(config.inputSelector));
+  const buttonElement = profileForm.querySelector(config.submitButtonSelector);
 
   inputList.forEach((inputElement) => {
-    const buttonElement = profileForm.querySelector(validationConfig.submitButtonSelector);
-    inputElement.classList.remove(`${validationConfig.inputErrorClass}`);
-
-    const errorElement = profileForm.querySelector(`.${inputElement.id}-error`);
-
-    errorElement.textContent = '';
-    errorElement.classList.remove(`${validationConfig.errorClass}`);
-    buttonElement.classList.add(validationConfig.inactiveButtonClass);
-    buttonElement.disabled = true;
+    hideInputError(profileForm, inputElement)
   })
+  disableButton(buttonElement, config)
 }
 
 // Функция включения и отключения кнопки
-export const toggleButton = (formSelector, buttonElement, config) => {
-  const inputList = Array.from(formSelector.querySelectorAll(config.inputSelector));
+export const toggleButton = (inputList, buttonElement, config) => {
   const hasInvalidInput = inputList.some(inputElement => !inputElement.validity.valid);
 
   if(hasInvalidInput) {
-    buttonElement.classList.add(config.inactiveButtonClass);
-    buttonElement.disabled = true;
+    disableButton(buttonElement, config);
   } else {
     buttonElement.classList.remove(config.inactiveButtonClass);
     buttonElement.disabled = false;

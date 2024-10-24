@@ -41,7 +41,7 @@ import { clearValidation, enableValidation, validationConfig, toggleButton } fro
 const profileSaveButton = profileForm.querySelector(validationConfig.submitButtonSelector);
 const cardSaveButton = formNewCard.querySelector(validationConfig.submitButtonSelector);
 const avatarSaveButton = formNewAvatar.querySelector(validationConfig.submitButtonSelector);
-const avatarLink = formNewAvatar.querySelector('.popup__input_type_url').value;
+const avatarInput = formNewAvatar.querySelector('.popup__input_type_url');
 
 function handleProfileFormSubmit(evt) {
   evt.preventDefault();
@@ -101,7 +101,7 @@ function handleNewAvatarSubmit(evt) {
   evt.preventDefault();
 
   avatarSaveButton.textContent = 'Сохранение...';
-  updateAvatar(avatarLink) 
+  updateAvatar(avatarInput.value) 
     .then((updatedUserData) => {
       profileImage.style.backgroundImage = `url(${updatedUserData.avatar})`;
 
@@ -153,7 +153,7 @@ formNewCard.addEventListener('submit', handleNewCardSubmit);
 formNewAvatar.addEventListener('submit', handleNewAvatarSubmit)
 
 profileAddButton.addEventListener('click', () => {
-  toggleButton(formNewCard, cardSaveButton, validationConfig)
+  // cardSaveButton.classList.add(validationConfig.inactiveButtonClass);
   openModal(popupTypeNewCard);
 })
 
